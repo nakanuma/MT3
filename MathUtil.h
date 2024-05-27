@@ -81,6 +81,8 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere);
 bool IsCollision(const AABB& aabb, const Segment& segment);
 // OBBと球の衝突判定
 bool IsCollision(const OBB& obb, const Sphere& sphere, Matrix& rotateMatrix);
+// OBBと線分の衝突判定
+bool IsCollision(const OBB& obb, const Segment& segment, Matrix& rotateMatrix);
 
 ///
 ///	便利系

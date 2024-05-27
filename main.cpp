@@ -31,18 +31,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vec3 rotate = { 0.0f, 0.0f, 0.0f };
 	OBB obb{
 		.center{-1.0f, 0.0f, 0.0f},
-		.orientations = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+		.orientations = {
+			{1.0f, 0.0f, 0.0f}, 
+			{0.0f, 1.0f, 0.0f}, 
+			{0.0f, 0.0f, 1.0f}},
 		.size{0.5f, 0.5f, 0.5f}
 	};
 
 	uint32_t color = WHITE;
 
-	// 球の情報
-	Sphere sphere = {
-		.center{0.0f, 0.0f, 0.0f},
-		.radius{0.5f}
+	// 線分の情報
+	Segment segment{
+		.origin{-0.8f, 0.3f, 0.0f},
+		.diff{0.5f, 0.5f, 0.5f}
 	};
-
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -82,9 +84,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		obb.orientations[2].x = rotateMatrix.m[2][0];
 		obb.orientations[2].y = rotateMatrix.m[2][1];
 		obb.orientations[2].z = rotateMatrix.m[2][2];
-		 
-		// OBBと球の衝突判定
-		if (IsCollision(obb, sphere, rotateMatrix)) {
+
+		// OBBと線分の衝突判定
+		if (IsCollision(obb, segment, rotateMatrix)) {
 			color = RED;
 		} else {
 			color = WHITE;
@@ -101,8 +103,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("obb.orientation.y", &obb.orientations->y, 0.01f);
 		ImGui::DragFloat3("obb.orientation.z", &obb.orientations->z, 0.01f);
 		ImGui::DragFloat3("obb.size", &obb.size.x, 0.01f);
-		ImGui::DragFloat3("sphere.center", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("sphere.radius", &sphere.radius, 0.01f);
+		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
 
 		ImGui::End();
 
@@ -117,8 +119,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// OBBの描画
 		DrawOBB(obb, viewProjectionMatrix, viewportMatrix, color);
 
-		// 球の描画
-		DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, WHITE, 20);
+		// 線分を描画
+		Vec3 start = Vec3::Transform(Vec3::Transform(segment.origin, viewProjectionMatrix), viewportMatrix);
+		Vec3 end = Vec3::Transform(Vec3::Transform(Vec3::Add(segment.origin, segment.diff), viewProjectionMatrix), viewportMatrix);
+		Novice::DrawLine(
+			static_cast<int>(start.x),
+			static_cast<int>(start.y),
+			static_cast<int>(end.x),
+			static_cast<int>(end.y),
+			WHITE);
 
 		// グリッドを描画
 		DrawGrid(viewProjectionMatrix, viewportMatrix);

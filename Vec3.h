@@ -18,6 +18,8 @@ public:
 	// float3つで初期化
 	Vec3(float argX, float argY, float argZ);
 
+	Vec3& operator+(const Vec3& other);
+
 	Vec3& operator+=(const Vec3& other);
 
 	// 加算

@@ -595,6 +595,38 @@ bool IsCollision(const OBB& obb, const Sphere& sphere, Matrix& rotateMatrix)
 	return false;
 }
 
+bool IsCollision(const OBB& obb, const Segment& segment, Matrix& rotateMatrix)
+{
+	// OBBのWorldMatrixを作る
+	Matrix obbWorldMatrix = rotateMatrix;
+	obbWorldMatrix.m[0][3] = 0;
+	obbWorldMatrix.m[1][3] = 0;
+	obbWorldMatrix.m[2][3] = 0;
+	obbWorldMatrix.m[3][3] = 1;
+
+	// 平行移動成分を代入
+	obbWorldMatrix.m[3][0] = obb.center.x;
+	obbWorldMatrix.m[3][1] = obb.center.y;
+	obbWorldMatrix.m[3][2] = obb.center.z;
+
+	// OBBのWorldMatrixの逆行列を求める
+	Matrix obbWorldMatrixInverse = Matrix::Inverse(obbWorldMatrix);
+
+	Vec3 localOrigin = Vec3::Transform(segment.origin, obbWorldMatrixInverse);
+	Vec3 localEnd = Vec3::Transform(Vec3::Add(segment.origin, segment.diff), obbWorldMatrixInverse);
+
+	AABB localAABB{
+		{-obb.size.x, -obb.size.y, -obb.size.z},
+		{+obb.size.x, +obb.size.y, +obb.size.z}
+	};
+
+	Segment localSegment;
+	localSegment.origin = localOrigin;
+	localSegment.diff = Vec3::Subtract(localEnd, localOrigin);
+
+	return IsCollision(localAABB, localSegment);
+}
+
 void VectorScreenPrintf(int x, int y, const Vec3& vector, const char* label)
 {
 	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
