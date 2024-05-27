@@ -82,7 +82,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		obb.orientations[2].x = rotateMatrix.m[2][0];
 		obb.orientations[2].y = rotateMatrix.m[2][1];
 		obb.orientations[2].z = rotateMatrix.m[2][2];
-
+		 
 		// OBBと球の衝突判定
 		if (IsCollision(obb, sphere, rotateMatrix)) {
 			color = RED;
