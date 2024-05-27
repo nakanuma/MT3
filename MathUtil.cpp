@@ -191,7 +191,7 @@ void DrawTriangle(const Triangle& triangle, const Matrix& viewProjectionMatrix, 
 	);
 }
 
-Vec3 WorldToScreen(const Vec3& worldCoordinate,const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix)
+Vec3 WorldToScreen(const Vec3& worldCoordinate, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix)
 {
 	// ワールド座標系->正規化デバイス座標系
 	Vec3 ndc = Vec3::Transform(worldCoordinate, viewProjectionMatrix);
@@ -252,39 +252,96 @@ bool IsCollision(const Segment& segment, const Plane& plane)
 
 bool IsCollision(const Triangle& triangle, const Segment& segment)
 {
-	// 三角形の法線ベクトルを計算
-	Vec3 edge1 = Vec3::Subtract(triangle.vertices[1], triangle.vertices[0]);
-	Vec3 edge2 = Vec3::Subtract(triangle.vertices[2], triangle.vertices[1]);
-	Vec3 cross1 = Vec3::Cross(edge1, edge2);
-	Vec3 normal = Vec3::Normalize(cross1);
+	// 2つのベクトルを計算
+	Vec3 vec1 = Vec3::Subtract(triangle.vertices[1], triangle.vertices[0]);
+	Vec3 vec2 = Vec3::Subtract(triangle.vertices[2], triangle.vertices[1]);
 
-	// 衝突点pを求める
-	Vec3 p = Vec3::Add(segment.origin, segment.diff);
+	// 外積を計算して法線ベクトルを得る
+	Vec3 normal = Vec3::Cross(vec1, vec2);
 
-	// 小三角形のクロス積を取る
-	// 0->1->pからなる三角形
-	Vec3 v01 = Vec3::Subtract(triangle.vertices[1], triangle.vertices[0]);
-	Vec3 v1p = Vec3::Subtract(p, triangle.vertices[1]);
-	Vec3 cross01 = Vec3::Cross(v01, v1p);
+	// 法線ベクトルを正規化
+	float length = Vec3::Length(normal);
+	normal.x /= length;
+	normal.y /= length;
+	normal.z /= length;
 
-	// 1->2->pからなる三角形
-	Vec3 v12 = Vec3::Subtract(triangle.vertices[2], triangle.vertices[1]);
-	Vec3 v2p = Vec3::Subtract(p, triangle.vertices[2]);
-	Vec3 cross12 = Vec3::Cross(v12, v2p);
+	// 平面までの距離を計算
+	float distance =
+		-(normal.x * triangle.vertices[0].x,
+			normal.y * triangle.vertices[0].y,
+			normal.z * triangle.vertices[0].z);
 
-	// 2->0->pからなる三角形
-	Vec3 v20 = Vec3::Subtract(triangle.vertices[0], triangle.vertices[2]);
-	Vec3 v0p = Vec3::Subtract(p, triangle.vertices[0]);
-	Vec3 cross20 = Vec3::Cross(v20, v0p);
+	// 三角形の存在する平面を作成
+	Plane plane = { normal, distance };
 
-	// すべての小三角形のクロス積と法線が同じ方向を向いていたら衝突
-	if (Vec3::Dot(cross01, normal) >= 0.0f && 
-		Vec3::Dot(cross12, normal) >= 0.0f && 
-		Vec3::Dot(cross20, normal) >= 0.0f) {
-		return true;
+	// 最初に線と三角形の存在する平面との衝突判定を行う
+	if (IsCollision(segment, plane)) {
+		// 衝突点pを求める
+		float dot = Vec3::Dot(plane.normal, segment.diff);
+		float t = (plane.distance - Vec3::Dot(segment.origin, plane.normal)) / dot;
+		Vec3 p = Vec3::Add(segment.origin, Vec3::Multiply(t, segment.diff));
+
+		// 小三角形のクロス積を取る
+		// 0->1->pからなる三角形
+		Vec3 v01 = Vec3::Subtract(triangle.vertices[1], triangle.vertices[0]);
+		Vec3 v1p = Vec3::Subtract(p, triangle.vertices[1]);
+		Vec3 cross01 = Vec3::Cross(v01, v1p);
+
+		// 1->2->pからなる三角形
+		Vec3 v12 = Vec3::Subtract(triangle.vertices[2], triangle.vertices[1]);
+		Vec3 v2p = Vec3::Subtract(p, triangle.vertices[2]);
+		Vec3 cross12 = Vec3::Cross(v12, v2p);
+
+		// 2->0->pからなる三角形
+		Vec3 v20 = Vec3::Subtract(triangle.vertices[0], triangle.vertices[2]);
+		Vec3 v0p = Vec3::Subtract(p, triangle.vertices[0]);
+		Vec3 cross20 = Vec3::Cross(v20, v0p);
+
+		// すべての小三角形のクロス積と法線が同じ方向を向いていたら衝突
+		if (Vec3::Dot(cross01, normal) >= 0.0f &&
+			Vec3::Dot(cross12, normal) >= 0.0f &&
+			Vec3::Dot(cross20, normal) >= 0.0f) {
+			return true;
+		}
 	}
 
 	return false;
+
+	/*----------------------------------------------------*/
+
+	//// 三角形の法線ベクトルを計算
+	//Vec3 edge1 = Vec3::Subtract(triangle.vertices[1], triangle.vertices[0]);
+	//Vec3 edge2 = Vec3::Subtract(triangle.vertices[2], triangle.vertices[1]);
+	//Vec3 cross1 = Vec3::Cross(edge1, edge2);
+	//Vec3 normal = Vec3::Normalize(cross1);
+
+	//// 衝突点pを求める
+	//Vec3 p = Vec3::Add(segment.origin, segment.diff);
+
+	//// 小三角形のクロス積を取る
+	//// 0->1->pからなる三角形
+	//Vec3 v01 = Vec3::Subtract(triangle.vertices[1], triangle.vertices[0]);
+	//Vec3 v1p = Vec3::Subtract(p, triangle.vertices[1]);
+	//Vec3 cross01 = Vec3::Cross(v01, v1p);
+
+	//// 1->2->pからなる三角形
+	//Vec3 v12 = Vec3::Subtract(triangle.vertices[2], triangle.vertices[1]);
+	//Vec3 v2p = Vec3::Subtract(p, triangle.vertices[2]);
+	//Vec3 cross12 = Vec3::Cross(v12, v2p);
+
+	//// 2->0->pからなる三角形
+	//Vec3 v20 = Vec3::Subtract(triangle.vertices[0], triangle.vertices[2]);
+	//Vec3 v0p = Vec3::Subtract(p, triangle.vertices[0]);
+	//Vec3 cross20 = Vec3::Cross(v20, v0p);
+
+	//// すべての小三角形のクロス積と法線が同じ方向を向いていたら衝突
+	//if (Vec3::Dot(cross01, normal) >= 0.0f &&
+	//	Vec3::Dot(cross12, normal) >= 0.0f &&
+	//	Vec3::Dot(cross20, normal) >= 0.0f) {
+	//	return true;
+	//}
+
+	//return false;
 }
 
 void VectorScreenPrintf(int x, int y, const Vec3& vector, const char* label)
