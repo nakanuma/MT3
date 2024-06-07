@@ -410,6 +410,31 @@ void DrawBezier(const Vec3& controlPoint0, const Vec3& controlPoint1, const Vec3
 	}
 }
 
+void DrawCatmullRom(const Vec3& controlPoint0, const Vec3& controlPoint1, const Vec3& controlPoint2, const Vec3& controlPoint3, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix, uint32_t color)
+{
+	const int segments = 20; // 曲線を描画するセグメント数
+	std::vector<Vec3> points;
+
+	// Catmullスプラインの補間
+	for (int i = 0; i <= segments; ++i) {
+		float t = static_cast<float>(i) / segments;
+		Vec3 p = CatmullRom(controlPoint0, controlPoint1, controlPoint2, controlPoint3, t);
+		points.push_back(p);
+	}
+
+	// スクリーン座標に変換して描画
+	for (int i = 0; i < segments; ++i) {
+		Vec3 screen1 = WorldToScreen(points[i], viewProjectionMatrix, viewportMatrix);
+		Vec3 screen2 = WorldToScreen(points[i + 1], viewProjectionMatrix, viewportMatrix);
+		// スクリーン座標で線を描画する関数を呼び出す
+		Novice::DrawLine(
+			static_cast<int>(screen1.x), static_cast<int>(screen1.y),
+			static_cast<int>(screen2.x), static_cast<int>(screen2.y),
+			color
+		);
+	}
+}
+
 Vec3 WorldToScreen(const Vec3& worldCoordinate, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix)
 {
 	// ワールド座標系->正規化デバイス座標系
@@ -686,6 +711,38 @@ void PreventionSwtichMinMax(AABB aabb)
 
 	aabb.min.z = (std::min)(aabb.min.z, aabb.max.z);
 	aabb.max.z = (std::max)(aabb.min.z, aabb.max.z);
+}
+
+Vec3 CatmullRom(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t)
+{
+	float t2 = t * t;
+	float t3 = t2 * t;
+
+	Vec3 a = {
+		p1.x * (2.0f * t3 - 3.0f * t2 + 1.0f),
+		p1.y * (2.0f * t3 - 3.0f * t2 + 1.0f),
+		p1.z * (2.0f * t3 - 3.0f * t2 + 1.0f),
+	};
+
+	Vec3 b = {
+		p2.x * (-2.0f * t3 + 3.0f * t2),
+		p2.y * (-2.0f * t3 + 3.0f * t2),
+		p2.z * (-2.0f * t3 + 3.0f * t2),
+	};
+
+	Vec3 c = {
+		p0.x * (t3 - 2.0f * t2 + t),
+		p0.y * (t3 - 2.0f * t2 + t),
+		p0.z * (t3 - 2.0f * t2 + t),
+	};
+
+	Vec3 d = {
+		p3.x * (t3 - t2),
+		p3.y * (t3 - t2),
+		p3.z * (t3 - t2),
+	};
+
+	return a + b + c + d;
 }
 
 void CameraControl(Vec3& cameraTranslate, Vec3& cameraRotate, int& prevMousePosX, int& prevMousePosY, bool& isFirstRightClick, bool& isFirstMiddleClick)

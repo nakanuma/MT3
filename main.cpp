@@ -28,10 +28,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	bool isFirstMiddleClick = true;
 
 	// ベジェ曲線のコントロールポイント
-	Vec3 controlPoints[3] = {
+	Vec3 controlPoints[4] = {
 		{-0.8f, 0.58f, 1.0f},
 		{1.76f, 1.0f, -0.3f},
-		{0.94f, -0.7f, 2.3f}
+		{0.94f, -0.7f, 2.3f},
+		{-0.53f, -0.26f, -0.15f}
 	};
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -63,6 +64,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("controlPoints[0]", &controlPoints[0].x, 0.01f);
 		ImGui::DragFloat3("controlPoints[1]", &controlPoints[1].x, 0.01f);
 		ImGui::DragFloat3("controlPoints[2]", &controlPoints[2].x, 0.01f);
+		ImGui::DragFloat3("controlPoints[3]", &controlPoints[3].x, 0.01f);
 
 		ImGui::End();
 
@@ -74,13 +76,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		// ベジェ曲線の描画
-		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], viewProjectionMatrix, viewportMatrix, WHITE);
+		// Catmull-rom曲線の描画
+		DrawCatmullRom(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3], viewProjectionMatrix, viewportMatrix, WHITE);
+		DrawCatmullRom(controlPoints[0], controlPoints[3], controlPoints[2], controlPoints[1], viewProjectionMatrix, viewportMatrix, WHITE);
+		DrawCatmullRom(controlPoints[3], controlPoints[1], controlPoints[0], controlPoints[2], viewProjectionMatrix, viewportMatrix, WHITE);
 
 		// それぞれの制御点を描画
 		DrawSphere({ controlPoints[0], 0.01f }, viewProjectionMatrix, viewportMatrix, BLACK, 5);
 		DrawSphere({ controlPoints[1], 0.01f }, viewProjectionMatrix, viewportMatrix, BLACK, 5);
 		DrawSphere({ controlPoints[2], 0.01f }, viewProjectionMatrix, viewportMatrix, BLACK, 5);
+		DrawSphere({ controlPoints[3], 0.01f }, viewProjectionMatrix, viewportMatrix, BLACK, 5);
 
 		// グリッドを描画
 		DrawGrid(viewProjectionMatrix, viewportMatrix);

@@ -61,6 +61,10 @@ void DrawOBB(const OBB& obb, const Matrix& viewProjectionMatrix, const Matrix& v
 void DrawBezier(const Vec3& controlPoint0, const Vec3& controlPoint1, const Vec3& controlPoint2,
 	const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix, uint32_t color
 );
+// Catmull-Rom曲線の描画
+void DrawCatmullRom(const Vec3& controlPoint0, const Vec3& controlPoint1, const Vec3& controlPoint2, const Vec3& controlPoint3,
+	const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix, uint32_t color
+);
 
 // ワールド座標->スクリーン座標に変換
 Vec3 WorldToScreen(const Vec3& worldCoordinate, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix);
@@ -98,6 +102,8 @@ void VectorScreenPrintf(int x, int y, const Vec3& vector, const char* label);
 void MatrixScreenPrintf(int x, int y, const Matrix& matrix, const char* label);
 // AABBのminとmaxの入れ替えを防止
 void PreventionSwtichMinMax(AABB aabb);
+// Catmull-Romスプラインの補間
+Vec3 CatmullRom(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t);
 
 // カメラの操作を行う
 void CameraControl(Vec3& cameraTranslate, Vec3& cameraRotate, int& prevMousePosX, int& prevMousePosY, bool& isFirstRightClick, bool& isFirstMiddleClick);
