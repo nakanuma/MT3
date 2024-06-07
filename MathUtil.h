@@ -57,6 +57,10 @@ void DrawTriangle(const Triangle& triangle, const Matrix& viewProjectionMatrix, 
 void DrawAABB(const AABB& aabb, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix, uint32_t color);
 // OBBの描画
 void DrawOBB(const OBB& obb, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix, uint32_t color);
+// ベジェ曲線の描画
+void DrawBezier(const Vec3& controlPoint0, const Vec3& controlPoint1, const Vec3& controlPoint2,
+	const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix, uint32_t color
+);
 
 // ワールド座標->スクリーン座標に変換
 Vec3 WorldToScreen(const Vec3& worldCoordinate, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix);

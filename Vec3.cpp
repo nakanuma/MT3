@@ -34,6 +34,22 @@ Vec3& Vec3::operator+=(const Vec3& other)
 	return *this;
 }
 
+Vec3& Vec3::operator*(const Vec3& other)
+{
+	x *= other.x;
+	y *= other.y;
+	z *= other.z;
+	return *this;
+}
+
+Vec3& Vec3::operator*=(const Vec3& other)
+{
+	this->x *= other.x;
+	this->y *= other.y;
+	this->z *= other.z;
+	return *this;
+}
+
 Vec3 Vec3::Add(const Vec3& v1, const Vec3& v2)
 {
 	return Vec3(
@@ -139,4 +155,13 @@ Vec3 Vec3::ClosestPoint(const Vec3& point, const Segment& segment)
 	Vec3 closestPoint = Add(segment.origin, Multiply(t, segment.diff));
 
 	return closestPoint;
+}
+
+Vec3 Vec3::Lerp(const Vec3& v1, const Vec3& v2, float t)
+{
+	return {
+		v1.x * (1.0f - t) + v2.x * t,
+		v1.y * (1.0f - t) + v2.y * t,
+		v1.z * (1.0f - t) + v2.z * t,
+	};
 }

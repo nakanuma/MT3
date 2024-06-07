@@ -27,23 +27,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	bool isFirstRightClick = true;
 	bool isFirstMiddleClick = true;
 
-	// OBBの情報
-	Vec3 rotate = { 0.0f, 0.0f, 0.0f };
-	OBB obb{
-		.center{-1.0f, 0.0f, 0.0f},
-		.orientations = {
-			{1.0f, 0.0f, 0.0f}, 
-			{0.0f, 1.0f, 0.0f}, 
-			{0.0f, 0.0f, 1.0f}},
-		.size{0.5f, 0.5f, 0.5f}
-	};
-
-	uint32_t color = WHITE;
-
-	// 線分の情報
-	Segment segment{
-		.origin{-0.8f, 0.3f, 0.0f},
-		.diff{0.5f, 0.5f, 0.5f}
+	// ベジェ曲線のコントロールポイント
+	Vec3 controlPoints[3] = {
+		{-0.8f, 0.58f, 1.0f},
+		{1.76f, 1.0f, -0.3f},
+		{0.94f, -0.7f, 2.3f}
 	};
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -69,42 +57,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix viewProjectionMatrix = Matrix::Multiply(viewMatrix, projectionMatrix);
 		Matrix viewportMatrix = Matrix::MakeViewport(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
-		// 回転行列を生成
-		Matrix rotateMatrix = Matrix::MakeRotateX(rotate.x) * Matrix::MakeRotateY(rotate.y) * Matrix::MakeRotateZ(rotate.z);
-
-		// 回転行列から軸を抽出
-		obb.orientations[0].x = rotateMatrix.m[0][0];
-		obb.orientations[0].y = rotateMatrix.m[0][1];
-		obb.orientations[0].z = rotateMatrix.m[0][2];
-
-		obb.orientations[1].x = rotateMatrix.m[1][0];
-		obb.orientations[1].y = rotateMatrix.m[1][1];
-		obb.orientations[1].z = rotateMatrix.m[1][2];
-
-		obb.orientations[2].x = rotateMatrix.m[2][0];
-		obb.orientations[2].y = rotateMatrix.m[2][1];
-		obb.orientations[2].z = rotateMatrix.m[2][2];
-
-		// OBBと線分の衝突判定
-		if (IsCollision(obb, segment, rotateMatrix)) {
-			color = RED;
-		} else {
-			color = WHITE;
-		}
-
 		// ImGui
 		ImGui::Begin("Window");
 
-		ImGui::DragFloat3("obb.center", &obb.center.x, 0.01f);
-		ImGui::SliderAngle("rotate.x", &rotate.x);
-		ImGui::SliderAngle("rotate.y", &rotate.y);
-		ImGui::SliderAngle("rotate.z", &rotate.z);
-		ImGui::DragFloat3("obb.orientation.x", &obb.orientations->x, 0.01f);
-		ImGui::DragFloat3("obb.orientation.y", &obb.orientations->y, 0.01f);
-		ImGui::DragFloat3("obb.orientation.z", &obb.orientations->z, 0.01f);
-		ImGui::DragFloat3("obb.size", &obb.size.x, 0.01f);
-		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("controlPoints[0]", &controlPoints[0].x, 0.01f);
+		ImGui::DragFloat3("controlPoints[1]", &controlPoints[1].x, 0.01f);
+		ImGui::DragFloat3("controlPoints[2]", &controlPoints[2].x, 0.01f);
 
 		ImGui::End();
 
@@ -116,18 +74,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		// OBBの描画
-		DrawOBB(obb, viewProjectionMatrix, viewportMatrix, color);
+		// ベジェ曲線の描画
+		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], viewProjectionMatrix, viewportMatrix, WHITE);
 
-		// 線分を描画
-		Vec3 start = Vec3::Transform(Vec3::Transform(segment.origin, viewProjectionMatrix), viewportMatrix);
-		Vec3 end = Vec3::Transform(Vec3::Transform(Vec3::Add(segment.origin, segment.diff), viewProjectionMatrix), viewportMatrix);
-		Novice::DrawLine(
-			static_cast<int>(start.x),
-			static_cast<int>(start.y),
-			static_cast<int>(end.x),
-			static_cast<int>(end.y),
-			WHITE);
+		// それぞれの制御点を描画
+		DrawSphere({ controlPoints[0], 0.01f }, viewProjectionMatrix, viewportMatrix, BLACK, 5);
+		DrawSphere({ controlPoints[1], 0.01f }, viewProjectionMatrix, viewportMatrix, BLACK, 5);
+		DrawSphere({ controlPoints[2], 0.01f }, viewProjectionMatrix, viewportMatrix, BLACK, 5);
 
 		// グリッドを描画
 		DrawGrid(viewProjectionMatrix, viewportMatrix);

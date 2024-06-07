@@ -19,8 +19,10 @@ public:
 	Vec3(float argX, float argY, float argZ);
 
 	Vec3& operator+(const Vec3& other);
-
 	Vec3& operator+=(const Vec3& other);
+
+	Vec3& operator*(const Vec3& other);
+	Vec3& operator*=(const Vec3& other);
 
 	// 加算
 	static Vec3 Add(const Vec3& v1, const Vec3& v2);
@@ -45,6 +47,9 @@ public:
 	static Vec3 Project(const Vec3& v1, const Vec3& v2);
 	// 最近接点
 	static Vec3 ClosestPoint(const Vec3& point, const Segment& segment);
+
+	// 線形補間
+	static Vec3 Lerp(const Vec3& v1, const Vec3& v2, float t);
 };
 
 // 直線

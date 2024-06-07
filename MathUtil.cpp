@@ -3,6 +3,9 @@
 #include <Novice.h>
 #include <math.h>
 #include <algorithm>
+#include <vector>
+#include <cmath>
+#include <iostream>
 
 #include "Vec3.h"
 #include "Vec4.h"
@@ -379,6 +382,32 @@ void DrawOBB(const OBB& obb, const Matrix& viewProjectionMatrix, const Matrix& v
 		color
 	);
 
+}
+
+void DrawBezier(const Vec3& controlPoint0, const Vec3& controlPoint1, const Vec3& controlPoint2, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix, uint32_t color)
+{
+	const int segments = 20; // 曲線を描画するセグメント数
+	std::vector<Vec3> points;
+
+	// それぞれの点を線形補間
+	for (int i = 0; i <= segments; ++i) {
+		float t = static_cast<float>(i) / segments;
+		Vec3 p0p1 = Vec3::Lerp(controlPoint0, controlPoint1, t);
+		Vec3 p1p2 = Vec3::Lerp(controlPoint1, controlPoint2, t);
+		Vec3 p = Vec3::Lerp(p0p1, p1p2, t);
+		points.push_back(p);
+	}
+	// スクリーン座標に変換して描画
+	for (int i = 0; i < segments; ++i) {
+		// スクリーン座標に変換
+		Vec3 screen1 = WorldToScreen(points[i], viewProjectionMatrix, viewportMatrix);
+		Vec3 screen2 = WorldToScreen(points[i + 1], viewProjectionMatrix, viewportMatrix);
+		Novice::DrawLine(
+			static_cast<int>(screen1.x), static_cast<int>(screen1.y),
+			static_cast<int>(screen2.x), static_cast<int>(screen2.y),
+			color
+		);
+	}
 }
 
 Vec3 WorldToScreen(const Vec3& worldCoordinate, const Matrix& viewProjectionMatrix, const Matrix& viewportMatrix)
