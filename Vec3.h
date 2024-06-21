@@ -21,8 +21,16 @@ public:
 	Vec3& operator+(const Vec3& other);
 	Vec3& operator+=(const Vec3& other);
 
+	Vec3& operator-(const Vec3& other);
+	Vec3& operator-=(const Vec3& other);
+
 	Vec3& operator*(const Vec3& other);
+	Vec3& operator*(float scalar);
 	Vec3& operator*=(const Vec3& other);
+
+	Vec3& operator/(const Vec3& other);
+	Vec3& operator/(float scalar);
+	Vec3& operator/=(const Vec3& other);
 
 	// 加算
 	static Vec3 Add(const Vec3& v1, const Vec3& v2);

@@ -96,8 +96,58 @@ Matrix Matrix::operator+=(const Matrix& m1)
 	return *this;
 }
 
+Matrix Matrix::operator-(const Matrix& m1) const
+{
+	return Matrix(
+		this->m[0][0] - m1.m[0][0],
+		this->m[0][1] - m1.m[0][1],
+		this->m[0][2] - m1.m[0][2],
+		this->m[0][3] - m1.m[0][3],
 
-Matrix Matrix::operator*(const Matrix& m1)
+		this->m[1][0] - m1.m[1][0],
+		this->m[1][1] - m1.m[1][1],
+		this->m[1][2] - m1.m[1][2],
+		this->m[1][3] - m1.m[1][3],
+
+		this->m[2][0] - m1.m[2][0],
+		this->m[2][1] - m1.m[2][1],
+		this->m[2][2] - m1.m[2][2],
+		this->m[2][3] - m1.m[2][3],
+
+		this->m[3][0] - m1.m[3][0],
+		this->m[3][1] - m1.m[3][1],
+		this->m[3][2] - m1.m[3][2],
+		this->m[3][3] - m1.m[3][3]
+	);
+}
+
+Matrix Matrix::operator-=(const Matrix& m1)
+{
+	this->m[0][0] -= m1.m[0][0];
+	this->m[0][1] -= m1.m[0][1];
+	this->m[0][2] -= m1.m[0][2];
+	this->m[0][3] -= m1.m[0][3];
+
+	this->m[1][0] -= m1.m[1][0];
+	this->m[1][1] -= m1.m[1][1];
+	this->m[1][2] -= m1.m[1][2];
+	this->m[1][3] -= m1.m[1][3];
+
+	this->m[2][0] -= m1.m[2][0];
+	this->m[2][1] -= m1.m[2][1];
+	this->m[2][2] -= m1.m[2][2];
+	this->m[2][3] -= m1.m[2][3];
+
+	this->m[3][0] -= m1.m[3][0];
+	this->m[3][1] -= m1.m[3][1];
+	this->m[3][2] -= m1.m[3][2];
+	this->m[3][3] -= m1.m[3][3];
+
+	return *this;
+}
+
+
+Matrix Matrix::operator*(const Matrix& m1) const
 {
 	return Matrix(
 		m[0][0] * m1.m[0][0] + m[0][1] * m1.m[1][0] + m[0][2] * m1.m[2][0] + m[0][3] * m1.m[3][0],
