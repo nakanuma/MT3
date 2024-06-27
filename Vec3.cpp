@@ -18,7 +18,7 @@ Vec3::Vec3(float argX, float argY, float argZ)
 	z = argZ;
 }
 
-Vec3& Vec3::operator+(const Vec3& other)
+Vec3& Vec3::operator+=(const Vec3& other)
 {
 	x += other.x;
 	y += other.y;
@@ -26,15 +26,7 @@ Vec3& Vec3::operator+(const Vec3& other)
 	return *this;
 }
 
-Vec3& Vec3::operator+=(const Vec3& other)
-{
-	this->x += other.x;
-	this->y += other.y;
-	this->z += other.z;
-	return *this;
-}
-
-Vec3& Vec3::operator-(const Vec3& other)
+Vec3& Vec3::operator-=(const Vec3& other)
 {
 	x -= other.x;
 	y -= other.y;
@@ -42,31 +34,7 @@ Vec3& Vec3::operator-(const Vec3& other)
 	return *this;
 }
 
-Vec3& Vec3::operator-=(const Vec3& other)
-{
-	this->x -= other.x;
-	this->y -= other.y;
-	this->z -= other.z;
-	return *this;
-}
-
-Vec3& Vec3::operator*(const Vec3& other)
-{
-	x *= other.x;
-	y *= other.y;
-	z *= other.z;
-	return *this;
-}
-
-Vec3& Vec3::operator*=(const Vec3& other)
-{
-	this->x *= other.x;
-	this->y *= other.y;
-	this->z *= other.z;
-	return *this;
-}
-
-Vec3& Vec3::operator*(float scalar)
+Vec3& Vec3::operator*=(float scalar)
 {
 	x *= scalar;
 	y *= scalar;
@@ -74,27 +42,11 @@ Vec3& Vec3::operator*(float scalar)
 	return *this;
 }
 
-Vec3& Vec3::operator/(const Vec3& other)
-{
-	x /= other.x;
-	y /= other.y;
-	z /= other.z;
-	return *this;
-}
-
-Vec3& Vec3::operator/(float scalar)
+Vec3& Vec3::operator/=(float scalar)
 {
 	x /= scalar;
 	y /= scalar;
 	z /= scalar;
-	return *this;
-}
-
-Vec3& Vec3::operator/=(const Vec3& other)
-{
-	this->x /= other.x;
-	this->y /= other.y;
-	this->z /= other.z;
 	return *this;
 }
 

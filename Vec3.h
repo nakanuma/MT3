@@ -18,19 +18,16 @@ public:
 	// float3つで初期化
 	Vec3(float argX, float argY, float argZ);
 
-	Vec3& operator+(const Vec3& other);
+	// 二項演算子
+	Vec3 operator+(const Vec3& other) const { return Add(*this, other); }
+	Vec3 operator-(const Vec3& other) const { return Subtract(*this, other); }
+	Vec3 operator*(float s) const { return Multiply(s, *this); }
+	Vec3 operator/(float s) const { return Multiply(1.0f / s, *this); }
+	// 複合代入演算子
 	Vec3& operator+=(const Vec3& other);
-
-	Vec3& operator-(const Vec3& other);
 	Vec3& operator-=(const Vec3& other);
-
-	Vec3& operator*(const Vec3& other);
-	Vec3& operator*(float scalar);
-	Vec3& operator*=(const Vec3& other);
-
-	Vec3& operator/(const Vec3& other);
-	Vec3& operator/(float scalar);
-	Vec3& operator/=(const Vec3& other);
+	Vec3& operator*=(float scalar);
+	Vec3& operator/=(float scalar);
 
 	// 加算
 	static Vec3 Add(const Vec3& v1, const Vec3& v2);
