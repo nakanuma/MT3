@@ -33,7 +33,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 平面の初期値
 	Plane plane;
-	plane.normal = Vec3::Normalize({ -0.2f, 0.9f, -0.3f });
+	plane.normal = Vec3::Normalize({ -0.2f, 1.2f, -0.3f });
 	plane.distance = 0.0f;
 
 	// ボールの初期値
