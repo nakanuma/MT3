@@ -45,6 +45,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// deltaTime
 	float deltaTime = 1.0f / 60.0f;
 
+	bool isSimulationRunning = false;
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -69,29 +71,34 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix viewportMatrix = Matrix::MakeViewport(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
 
-		Vec3 diff = ball.position - spring.anchor; // ばねの現在の長さ
-		float length = Vec3::Length(diff); // diffベクトルの長さ
-		if (length != 0.0f) {
-			Vec3 direction = Vec3::Normalize(diff); // diffを正規化してばねの方向を計算
-			Vec3 restPosition = spring.anchor + direction * spring.naturalLength; // ばねが自然長のときのボールの位置
-			Vec3 displacement = length * (ball.position - restPosition); // ばねが変位している量
-			Vec3 restoringForce = -spring.stiffness * displacement; // 復元力の計算（変位に反対の方向）
+		if (isSimulationRunning) {
+			Vec3 diff = ball.position - spring.anchor; // ばねの現在の長さ
+			float length = Vec3::Length(diff); // diffベクトルの長さ
+			if (length != 0.0f) {
+				Vec3 direction = Vec3::Normalize(diff); // diffを正規化してばねの方向を計算
+				Vec3 restPosition = spring.anchor + direction * spring.naturalLength; // ばねが自然長のときのボールの位置
+				Vec3 displacement = length * (ball.position - restPosition); // ばねが変位している量
+				Vec3 restoringForce = -spring.stiffness * displacement; // 復元力の計算（変位に反対の方向）
 
-			// 減衰抵抗を計算する
-			Vec3 dampingForce = -spring.dampingCoefficient * ball.velocity;
-			// 減衰抵抗も加味して、物体にかかる力を決定する
-			Vec3 force = restoringForce + dampingForce;
+				// 減衰抵抗を計算する
+				Vec3 dampingForce = -spring.dampingCoefficient * ball.velocity;
+				// 減衰抵抗も加味して、物体にかかる力を決定する
+				Vec3 force = restoringForce + dampingForce;
 
-			ball.acceleration = force / ball.mass; // 力を質量で割って加速度を求める
+				ball.acceleration = force / ball.mass; // 力を質量で割って加速度を求める
+			}
+			// 加速度も速度もどちらも秒を基準とした値である
+			// それが、1/60秒間(deltaTime)適用されたと考える
+			ball.velocity += ball.acceleration * deltaTime;
+			ball.position += ball.velocity * deltaTime;
 		}
-		// 加速度も速度もどちらも秒を基準とした値である
-		// それが、1/60秒間(deltaTime)適用されたと考える
-		ball.velocity += ball.acceleration * deltaTime;
-		ball.position += ball.velocity * deltaTime;
 
 		// ImGui
 		ImGui::Begin("Window");
 
+		if (ImGui::Button("Start")) {
+			isSimulationRunning = true;
+		}
 
 		ImGui::End();
 
